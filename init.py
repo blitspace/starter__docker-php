@@ -3,7 +3,10 @@
 import glob
 import re
 
-files = glob.glob("./docker/*.*", recursive=True, , include_hidden=True)
+files = glob.glob("./docker/*.*", recursive=True) \
+    + glob.glob("./docker/.env") \
+    + glob.glob("./README.md")
+
 print(files)
 
 old_text="{{project_name}}"
