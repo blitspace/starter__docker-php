@@ -1,4 +1,4 @@
-# Johnny Air Corporation Website
+# {{project_name}}
 
 
 ## Start on windows:

@@ -1,18 +1,18 @@
 version: '3'
 services:
   db:
-    container_name: jac-db
+    container_name: {{project_name}}-db
     image: mariadb:10.2
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: johnnyaircorp-2022
+      MYSQL_DATABASE: {{project_name}}_db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: jac-web
+    container_name: {{project_name}}-web
     depends_on:
       - db
     volumes:
@@ -27,12 +27,12 @@ services:
       XDEBUG_MODE: debug
   adminer:
     image: adminer
-    container_name: jac-adminer
+    container_name: {{project_name}}-adminer
     ports:
       - "8081:8080"
   phpmyadmin:
     image: phpmyadmin
-    container_name: jac-phpmyadmin
+    container_name: {{project_name}}-phpmyadmin
     ports:
       - 8091:80
     environment:
