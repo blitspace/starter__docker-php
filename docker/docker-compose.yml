@@ -1,0 +1,39 @@
+version: '3'
+services:
+  db:
+    container_name: jac-db
+    image: mariadb:10.2
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: johnnyaircorp-2022
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jac-web
+    depends_on:
+      - db
+    volumes:
+      - ../src:/var/www/html/
+      - ./php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+    ports:
+      - "81:80"
+    environment:
+      XDEBUG_CONFIG: remote_host=host.docker.internal remote_port=9000 remote_enable=1
+      PHP_EXTENSION_XDEBUG: 1
+      XDEBUG_MODE: debug
+  adminer:
+    image: adminer
+    container_name: jac-adminer
+    ports:
+      - "8081:8080"
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: jac-phpmyadmin
+    ports:
+      - 8091:80
+    environment:
+      PMA_ARBITRARY: 1
