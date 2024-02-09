@@ -1,13 +1,18 @@
 #! /usr/bin/env python
 
 import glob
+import os
 import re
+import urllib.request
+from zipfile import ZipFile 
+from pathlib import Path
+import shutil
+from colorama import Fore
+from pprint import PrettyPrinter
 
 
 def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> None:
-    files = glob.glob(pattern, recursive=True) \
-
-    print(files)
+    files = glob.glob(pattern, recursive=True)
 
     for file_name in files:
         with open(file_name, 'r+') as f:
@@ -17,6 +22,15 @@ def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> N
             f.seek(0)
             f.write(file)
             f.truncate()
+
+def process_wp():
+    pass
+
+
+pp = PrettyPrinter()
+
+wordpress_download_link = "https://wordpress.org/latest.zip"
+temp_path = "./temp"
 
 
 old_text="{{project_name}}"
@@ -30,6 +44,46 @@ if not new_text:
     print("Please input a valid project name")
     exit(1)
 
-search_replace_files("./docker/*.*", old_text, new_text_processed)
-search_replace_files("./docker/.env", old_text, new_text_processed)
-search_replace_files("./README.md", old_text, new_text)
+# search_replace_files("./docker/*.*", old_text, new_text_processed)
+# search_replace_files("./docker/.env", old_text, new_text_processed)
+# search_replace_files("./README.md", old_text, new_text)
+
+# Create temp directory if not exists
+Path(temp_path).mkdir(parents=True, exist_ok=True)
+
+if Path(f"{temp_path}/latest.zip").exists():
+    print(f"Using {temp_path}/latest.zip")
+else:
+    print("\nDownloading latest WordPress...")
+    urllib.request.urlretrieve(wordpress_download_link, f"{temp_path}/latest.zip")
+    print("Done download...")
+
+print("\nExtracting WordPress files")
+with ZipFile(f"{temp_path}/latest.zip", 'r') as zip_obj: 
+    zip_obj.extractall(path=temp_path) 
+
+files = sorted([f for f in glob.glob(f"{temp_path}/wordpress/**/*.*", recursive=True)])
+
+pp.pprint(files)
+# exit(2)
+
+for f in files:
+    f = f.replace("\\", "/")
+    d = "./src/" + "/".join(f.split("/")[3:-1])
+
+    # print(f)
+
+    if not Path(d).exists():
+        print(Fore.BLUE, "Creating directory", d, Fore.RESET)
+        Path(d).mkdir(parents=True, exist_ok=True)
+
+    dest = "./src" + f.replace(f"{temp_path}/wordpress", "")
+    print(Fore.GREEN, "moving: ", f, "->", dest, Fore.RESET)
+
+    shutil.move(f, dest)
+
+print("\nRemove temp directory?")
+remove_temp_dir = input()
+
+if remove_temp_dir.lower() == "y":
+    shutil.rmtree(temp_path)
