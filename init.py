@@ -56,8 +56,6 @@ def process_wp():
         f = f.replace("\\", "/")
         d = "./src/" + "/".join(f.split("/")[3:-1])
 
-        # print(f)
-
         if not Path(d).exists():
             if verbose:
                 print(Fore.BLUE, "Creating directory", d, Fore.RESET)
@@ -107,6 +105,8 @@ if __name__ == "__main__":
     if process_wp_prompt == "Y":
         process_wp()
 
+    print("\n")
+    print("=================================")
     print("Init docker")
     print("=================================")
     print("cd docker")
