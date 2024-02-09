@@ -30,7 +30,7 @@ def process_docker_files():
 
 
 def process_wp():
-    shutil.move('./wp-config-sample.php', './src/wp-config.php')
+    shutil.copy('./wp/wp-config-sample.php', './src/wp-config.php')
     search_replace_files("./src/wp-config.php", old_text, new_text_processed)
 
     # Create temp directory if not exists
@@ -70,7 +70,7 @@ def process_wp():
 
         shutil.move(f, dest)
 
-    print("\nRemove temp directory? [Y/n]", end="")
+    print("\nRemove temp directory? [Y/n]", end=" ")
     remove_temp_dir = input()
 
     if remove_temp_dir == "Y":
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     old_text="{{project_name}}"
 
-    print("Please input the project name:", end="")
+    print("Please input the project name:", end=" ")
     new_text=input()
     new_text_processed = new_text.replace(" ", "-")
     new_text_processed = new_text_processed.lower()
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         print("Please input a valid project name")
         exit(1)
 
-    print("Do you want to install WordPress? [Y/n]", end="")
+    print("Do you want to install WordPress? [Y/n]", end=" ")
     process_wp_prompt = input()
 
 
@@ -106,3 +106,8 @@ if __name__ == "__main__":
 
     if process_wp_prompt == "Y":
         process_wp()
+
+    print("Init docker")
+    print("=================================")
+    print("cd docker")
+    print("docker compose up -d")
