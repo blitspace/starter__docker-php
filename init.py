@@ -66,6 +66,11 @@ def move_files(_src: str, _dest, rename_templates=False, copy=False) -> None:
         f = f.replace("\\", "/")
         d = f"{_dest}/" + "/".join(f.split("/")[3:-1])
 
+        if Path(f).is_dir():
+            Path(f).mkdir(parents=True, exist_ok=True)
+            pbar.update(indx)
+            continue
+
         if not Path(d).exists():
             if verbose:
                 print(Fore.BLUE + "Creating directory", d, Fore.RESET)
@@ -141,7 +146,6 @@ if __name__ == "__main__":
     wordpress_download_link = "https://wordpress.org/latest.zip"
     temp_path = "./temp"
     verbose = False
-
 
     old_text="{{project_name}}"
 
