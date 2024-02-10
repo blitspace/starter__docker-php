@@ -95,9 +95,8 @@ def process_wp():
     else:
         print(Fore.GREEN + "\nDownloading latest WordPress...", Fore.RESET)
         urllib.request.urlretrieve(wordpress_download_link, f"{temp_path}/latest.zip", show_progress)
-        print("Done download...")
 
-    print(Fore.GREEN + "\nExtracting WordPress files...", Fore.RESET, end=" ")
+    print(Fore.GREEN + "\nExtracting WordPress files...", Fore.RESET)
 
     with ZipFile(f"{temp_path}/latest.zip", 'r') as zip_obj:
         files = zip_obj.infolist()
