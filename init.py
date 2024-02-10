@@ -50,7 +50,7 @@ def process_docker_files():
 def process_wp():
     global pbar
 
-    shutil.copy('./wp/wp-config-sample.php', './src/wp-config.php')
+    shutil.copy('./templates/wp-config-sample.php.template', './src/wp-config.php')
     search_replace_files("./src/wp-config.php", old_text, new_text_processed)
 
     # Create temp directory if not exists
@@ -73,7 +73,7 @@ def process_wp():
     if verbose:
         pp.pprint(files)
 
-    print("Moving files")
+    print("Moving files...")
 
     if pbar is None:
         pbar = progressbar.ProgressBar(max_value=len(files))
