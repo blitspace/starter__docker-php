@@ -43,13 +43,14 @@ def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> N
 
 
 def process_docker_files():
-    move_files("./templates/docker", "./", rename_templates=True)
+    move_files("./templates/docker", "./docker", rename_templates=True, copy=True)
+
     search_replace_files("./docker/*.*", old_text, new_text_processed)
     search_replace_files("./docker/.env", old_text, new_text_processed)
     search_replace_files("./README.md", old_text, new_text)
 
 
-def move_files(_src: str, _dest, rename_templates=False) -> None:
+def move_files(_src: str, _dest, rename_templates=False, copy=False) -> None:
     global pbar
 
     files = sorted([f for f in glob.glob(_src + "/**/*.*", recursive=True)])
@@ -78,7 +79,11 @@ def move_files(_src: str, _dest, rename_templates=False) -> None:
         if verbose:
             print(Fore.GREEN + "Moving: ", f, "->", dest, Fore.RESET)
 
-        shutil.move(f, dest)
+        if copy:
+            shutil.copy(f, dest)
+        else:
+            shutil.move(f, dest)
+
         pbar.update(indx)
 
     pbar.finish()
