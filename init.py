@@ -10,6 +10,7 @@ import shutil
 from colorama import Fore
 from pprint import PrettyPrinter
 import progressbar
+# from tqdm import tqdm
 
 pbar = None
 
@@ -57,6 +58,7 @@ def move_files(_src: str, _dest, move=True) -> None:
 
     if pbar is None:
         pbar = progressbar.ProgressBar(max_value=len(files))
+        pbar.start()
 
     for indx, f in enumerate(files):
         f = f.replace("\\", "/")
@@ -97,12 +99,21 @@ def process_wp():
 
     print(Fore.GREEN + "\nExtracting WordPress files...", Fore.RESET, end=" ")
 
-    with ZipFile(f"{temp_path}/latest.zip", 'r') as zip_obj: 
-        zip_obj.extractall(path=temp_path) 
+    with ZipFile(f"{temp_path}/latest.zip", 'r') as zip_obj:
+        files = zip_obj.infolist()
 
-    print("DONE.")
+        if pbar is None:
+            pbar = progressbar.ProgressBar(max_value=len(files))
+            pbar.start()
 
-    print("Moving files...")
+        for indx, file in enumerate(files):
+            zip_obj.extract(file, temp_path)
+            pbar.update(indx)
+
+        pbar.finish()
+        pbar = None
+
+    print(Fore.GREEN + "\nMoving files...", Fore.RESET)
     move_files(f"{temp_path}/wordpress", "./src")
 
 
