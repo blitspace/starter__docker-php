@@ -47,6 +47,38 @@ def process_docker_files():
     search_replace_files("./README.md", old_text, new_text)
 
 
+def move_files(_src: str, _dest, move=True) -> None:
+    global pbar
+
+    files = sorted([f for f in glob.glob(_src + "/**/*.*", recursive=True)])
+
+    if verbose:
+        pp.pprint(files)
+
+    if pbar is None:
+        pbar = progressbar.ProgressBar(max_value=len(files))
+
+    for indx, f in enumerate(files):
+        f = f.replace("\\", "/")
+        d = f"{_dest}/" + "/".join(f.split("/")[3:-1])
+
+        if not Path(d).exists():
+            if verbose:
+                print(Fore.BLUE + "Creating directory", d, Fore.RESET)
+            Path(d).mkdir(parents=True, exist_ok=True)
+
+        dest = _dest + f.replace(_src, "")
+
+        if verbose:
+            print(Fore.GREEN + "Moving: ", f, "->", dest, Fore.RESET)
+
+        shutil.move(f, dest)
+        pbar.update(indx)
+
+    pbar.finish()
+    pbar = None
+
+
 def process_wp():
     global pbar
 
@@ -64,39 +96,15 @@ def process_wp():
         print("Done download...")
 
     print(Fore.GREEN + "\nExtracting WordPress files...", Fore.RESET, end=" ")
+
     with ZipFile(f"{temp_path}/latest.zip", 'r') as zip_obj: 
         zip_obj.extractall(path=temp_path) 
-    print("DONE")
 
-    files = sorted([f for f in glob.glob(f"{temp_path}/wordpress/**/*.*", recursive=True)])
-
-    if verbose:
-        pp.pprint(files)
+    print("DONE.")
 
     print("Moving files...")
+    move_files(f"{temp_path}/wordpress", "./src")
 
-    if pbar is None:
-        pbar = progressbar.ProgressBar(max_value=len(files))
-
-    for indx, f in enumerate(files):
-        f = f.replace("\\", "/")
-        d = "./src/" + "/".join(f.split("/")[3:-1])
-
-        if not Path(d).exists():
-            if verbose:
-                print(Fore.BLUE + "Creating directory", d, Fore.RESET)
-            Path(d).mkdir(parents=True, exist_ok=True)
-
-        dest = "./src" + f.replace(f"{temp_path}/wordpress", "")
-
-        if verbose:
-            print(Fore.GREEN + "moving: ", f, "->", dest, Fore.RESET)
-
-        shutil.move(f, dest)
-        pbar.update(indx)
-    
-    pbar.finish()
-    pbar = None
 
     print("\nRemove temp directory? [y/N]", end=" ")
     remove_temp_dir = input()
