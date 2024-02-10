@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env py -3.11
 
 import glob
 import os
@@ -53,7 +53,7 @@ def process_docker_files():
 def move_files(_src: str, _dest, rename_templates=False, copy=False) -> None:
     global pbar
 
-    files = sorted([f for f in glob.glob(_src + "/**/*.*", recursive=True)])
+    files = sorted([f for f in glob.glob(_src + "/**/*.*", recursive=True, include_hidden=True)])
 
     if verbose:
         pp.pprint(files)
@@ -66,10 +66,10 @@ def move_files(_src: str, _dest, rename_templates=False, copy=False) -> None:
         f = f.replace("\\", "/")
         d = f"{_dest}/" + "/".join(f.split("/")[3:-1])
 
-        if Path(f).is_dir():
-            Path(f).mkdir(parents=True, exist_ok=True)
-            pbar.update(indx)
-            continue
+        # if Path(f).is_dir():
+        #     Path(f).mkdir(parents=True, exist_ok=True)
+        #     pbar.update(indx)
+        #     continue
 
         if not Path(d).exists():
             if verbose:
@@ -84,10 +84,11 @@ def move_files(_src: str, _dest, rename_templates=False, copy=False) -> None:
         if verbose:
             print(Fore.GREEN + "Moving: ", f, "->", dest, Fore.RESET)
 
-        if copy:
-            shutil.copy(f, dest)
-        else:
-            shutil.move(f, dest)
+        if Path(f).is_file():
+            if copy:
+                shutil.copy(f, dest)
+            else:
+                shutil.move(f, dest)
 
         pbar.update(indx)
 
@@ -145,7 +146,7 @@ if __name__ == "__main__":
 
     wordpress_download_link = "https://wordpress.org/latest.zip"
     temp_path = "./temp"
-    verbose = False
+    verbose = True
 
     old_text="{{project_name}}"
 
