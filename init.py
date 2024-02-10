@@ -43,6 +43,7 @@ def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> N
 
 
 def process_docker_files():
+    move_files("./templates/docker", "./", rename_templates=True)
     search_replace_files("./docker/*.*", old_text, new_text_processed)
     search_replace_files("./docker/.env", old_text, new_text_processed)
     search_replace_files("./README.md", old_text, new_text)
