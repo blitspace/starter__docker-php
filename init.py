@@ -9,6 +9,23 @@ from pathlib import Path
 import shutil
 from colorama import Fore
 from pprint import PrettyPrinter
+import progressbar
+
+pbar = None
+
+def show_progress(block_num, block_size, total_size):
+    global pbar
+
+    if pbar is None:
+        pbar = progressbar.ProgressBar(maxval=total_size)
+        pbar.start()
+
+    downloaded = block_num * block_size
+    if downloaded < total_size:
+        pbar.update(downloaded)
+    else:
+        pbar.finish()
+        pbar = None
 
 
 def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> None:
@@ -23,6 +40,7 @@ def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> N
             f.write(file)
             f.truncate()
 
+
 def process_docker_files():
     search_replace_files("./docker/*.*", old_text, new_text_processed)
     search_replace_files("./docker/.env", old_text, new_text_processed)
@@ -30,6 +48,8 @@ def process_docker_files():
 
 
 def process_wp():
+    global pbar
+
     shutil.copy('./wp/wp-config-sample.php', './src/wp-config.php')
     search_replace_files("./src/wp-config.php", old_text, new_text_processed)
 
@@ -37,41 +57,52 @@ def process_wp():
     Path(temp_path).mkdir(parents=True, exist_ok=True)
 
     if Path(f"{temp_path}/latest.zip").exists():
-        print(f"Using {temp_path}/latest.zip")
+        print(f"\nUsing {temp_path}/latest.zip")
     else:
-        print("\nDownloading latest WordPress...")
-        urllib.request.urlretrieve(wordpress_download_link, f"{temp_path}/latest.zip")
+        print(Fore.GREEN + "\nDownloading latest WordPress...", Fore.RESET)
+        urllib.request.urlretrieve(wordpress_download_link, f"{temp_path}/latest.zip", show_progress)
         print("Done download...")
 
-    print("\nExtracting WordPress files")
+    print(Fore.GREEN + "\nExtracting WordPress files...", Fore.RESET, end=" ")
     with ZipFile(f"{temp_path}/latest.zip", 'r') as zip_obj: 
         zip_obj.extractall(path=temp_path) 
+    print("DONE")
 
     files = sorted([f for f in glob.glob(f"{temp_path}/wordpress/**/*.*", recursive=True)])
 
     if verbose:
         pp.pprint(files)
 
-    for f in files:
+    print("Moving files")
+
+    if pbar is None:
+        pbar = progressbar.ProgressBar(max_value=len(files))
+
+    for indx, f in enumerate(files):
         f = f.replace("\\", "/")
         d = "./src/" + "/".join(f.split("/")[3:-1])
 
         if not Path(d).exists():
             if verbose:
-                print(Fore.BLUE, "Creating directory", d, Fore.RESET)
+                print(Fore.BLUE + "Creating directory", d, Fore.RESET)
             Path(d).mkdir(parents=True, exist_ok=True)
 
         dest = "./src" + f.replace(f"{temp_path}/wordpress", "")
 
         if verbose:
-            print(Fore.GREEN, "moving: ", f, "->", dest, Fore.RESET)
+            print(Fore.GREEN + "moving: ", f, "->", dest, Fore.RESET)
 
         shutil.move(f, dest)
+        pbar.update(indx)
+    
+    pbar.finish()
+    pbar = None
 
-    print("\nRemove temp directory? [Y/n]", end=" ")
+    print("\nRemove temp directory? [y/N]", end=" ")
     remove_temp_dir = input()
 
-    if remove_temp_dir == "Y":
+    if not remove_temp_dir == "N":
+        print(Fore.GREEN + "Removing temp directory...", Fore.RESET)
         shutil.rmtree(temp_path)
 
 
