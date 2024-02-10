@@ -48,7 +48,7 @@ def process_docker_files():
     search_replace_files("./README.md", old_text, new_text)
 
 
-def move_files(_src: str, _dest, move=True) -> None:
+def move_files(_src: str, _dest, rename_templates=False) -> None:
     global pbar
 
     files = sorted([f for f in glob.glob(_src + "/**/*.*", recursive=True)])
@@ -70,6 +70,9 @@ def move_files(_src: str, _dest, move=True) -> None:
             Path(d).mkdir(parents=True, exist_ok=True)
 
         dest = _dest + f.replace(_src, "")
+
+        if rename_templates:
+            dest = dest.replace(".template", "")
 
         if verbose:
             print(Fore.GREEN + "Moving: ", f, "->", dest, Fore.RESET)
