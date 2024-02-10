@@ -1,4 +1,4 @@
-#! /usr/bin/env py -3.11
+#! /usr/bin/env py
 
 import glob
 import os
@@ -10,6 +10,7 @@ import shutil
 from colorama import Fore
 from pprint import PrettyPrinter
 import progressbar
+import sys
 # from tqdm import tqdm
 
 pbar = None
@@ -43,6 +44,7 @@ def search_replace_files(pattern: list | str, old_text: str, new_text: str) -> N
 
 
 def process_docker_files():
+    print(Fore.GREEN + "\nCopy docker files...", Fore.RESET)
     move_files("./templates/docker", "./docker", rename_templates=True, copy=True)
 
     search_replace_files("./docker/*.*", old_text, new_text_processed)
@@ -65,11 +67,6 @@ def move_files(_src: str, _dest, rename_templates=False, copy=False) -> None:
     for indx, f in enumerate(files):
         f = f.replace("\\", "/")
         d = f"{_dest}/" + "/".join(f.split("/")[3:-1])
-
-        # if Path(f).is_dir():
-        #     Path(f).mkdir(parents=True, exist_ok=True)
-        #     pbar.update(indx)
-        #     continue
 
         if not Path(d).exists():
             if verbose:
@@ -144,9 +141,13 @@ def process_wp():
 if __name__ == "__main__":
     pp = PrettyPrinter()
 
+    if sys.version_info.major >= 3 and sys.version_info.minor < 11:
+        print("Please use python version 3.11 or higher")
+        sys.exit(1)
+
     wordpress_download_link = "https://wordpress.org/latest.zip"
     temp_path = "./temp"
-    verbose = True
+    verbose = False or "-v" in sys.argv
 
     old_text="{{project_name}}"
 
