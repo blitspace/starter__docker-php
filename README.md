@@ -40,8 +40,17 @@ scoop bucket add extras
 scoop install mkcert
 ```
 
+
+### Set `wp-content` Permissions
+```
+cd /var/html/www
+sudo chown -R www-data:www-data wp-content/plugins/
+sudo chmod 775 wp-content
+```
+
 ----------
 ### References
-- https://github.com/mlocati/docker-php-extension-installer
-- https://iammohaiminul.medium.com/run-php-application-using-docker-with-apache-and-ssl-certificates-327a8ee2056b
-- https://github.com/FiloSottile/mkcert#installation
+- [Docker PHP Extension Installer](https://github.com/mlocati/docker-php-extension-installer)
+- [Install and generating certificates](https://iammohaiminul.medium.com/run-php-application-using-docker-with-apache-and-ssl-certificates-327a8ee2056b)
+- [mkcert installation](https://github.com/FiloSottile/mkcert#installation)
+- [Setting wp-content permissions](https://stackoverflow.com/a/53930960)
