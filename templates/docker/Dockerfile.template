@@ -11,7 +11,15 @@ RUN apt-get install --yes --force-yes cron g++ gettext libicu-dev openssl \
     libmemcached-dev libxslt-dev \
     vim
 
-RUN a2enmod rewrite
+RUN a2enmod ssl && a2enmod rewrite
+RUN a2ensite default-ssl
+RUN mkdir -p /etc/apache2/ssl
+
+COPY ./ssl/*.pem /etc/apache2/ssl/
+COPY ./apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+RUN sed -i '/SSLCertificateFile.*snakeoil\.pem/c\SSLCertificateFile \/etc\/apache2\/ssl\/cert.pem' /etc/apache2/sites-available/default-ssl.conf
+RUN sed -i '/SSLCertificateKeyFile.*snakeoil\.key/cSSLCertificateKeyFile /etc/apache2/ssl/cert-key.pem' /etc/apache2/sites-available/default-ssl.conf
 
 RUN docker-php-ext-install mysqli 
 RUN docker-php-ext-enable mysqli
