@@ -26,3 +26,12 @@ RUN docker-php-ext-enable mysqli
 
 RUN docker-php-ext-configure gd --with-freetype=/usr --with-jpeg=/usr
 RUN docker-php-ext-install gd
+
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x wp-cli.phar
+RUN mv wp-cli.phar /usr/local/bin/wp
+
+WORKDIR /var/www/html
+
+EXPOSE 80
+EXPOSE 443
