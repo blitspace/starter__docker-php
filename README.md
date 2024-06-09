@@ -42,6 +42,6 @@ scoop install mkcert
 
 ----------
 ### References
-https://github.com/mlocati/docker-php-extension-installer
-https://iammohaiminul.medium.com/run-php-application-using-docker-with-apache-and-ssl-certificates-327a8ee2056b
-https://github.com/FiloSottile/mkcert#installation
+- https://github.com/mlocati/docker-php-extension-installer
+- https://iammohaiminul.medium.com/run-php-application-using-docker-with-apache-and-ssl-certificates-327a8ee2056b
+- https://github.com/FiloSottile/mkcert#installation
